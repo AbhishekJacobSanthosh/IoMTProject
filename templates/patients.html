@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Patient Registry</h1>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Registered Patients</h5>
+            </div>
+            <div class="card-body">
+                {% if patients %}
+                <div class="row">
+                    {% for patient_id in patients %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ patient_id }}</h5>
+                                <p class="card-text">
+                                    <i class="bi bi-person"></i> Patient ID: {{ patient_id }}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <a href="{{ url_for('patient_history', patient_id=patient_id) }}" class="btn btn-primary">
+                                    View Medical History
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p>No patients registered in the system yet.</p>
+                    <a href="{{ url_for('add_data') }}" class="btn btn-primary">Generate Sample Data</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Patient Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3>{{ patients|length }}</h3>
+                                <p class="mb-0">Total Patients</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <canvas id="patientDistributionChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3>{{ '%0.2f'|format(patients|length / 10) }}</h3>
+                                <p class="mb-0">Patients per Block</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Create a simple chart for patient distribution
+    const ctx = document.getElementById('patientDistributionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Registered Patients', 'Available Capacity'],
+            datasets: [{
+                data: [{{ patients|length }}, Math.max(10 - {{ patients|length }}, 0)],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(211, 211, 211, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(211, 211, 211, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Patient Distribution'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

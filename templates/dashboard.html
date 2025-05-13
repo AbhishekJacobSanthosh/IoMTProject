@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Health Monitoring Dashboard</h1>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Latest Health Data</h5>
+            </div>
+            <div class="card-body">
+                {% if latest_data %}
+                <h6>Patient ID: {{ latest_data.patient_id }}</h6>
+                <p>Time: {{ latest_data.readable_time }}</p>
+                <table class="table table-striped">
+                    <tr>
+                        <th>Vital Sign</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Heart Rate</td>
+                        <td>{{ latest_data.heart_rate }} bpm</td>
+                        <td>
+                            {% if latest_data.heart_rate > 100 %}
+                            <span class="badge bg-danger">High</span>
+                            {% elif latest_data.heart_rate < 60 %}
+                            <span class="badge bg-warning">Low</span>
+                            {% else %}
+                            <span class="badge bg-success">Normal</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Blood Pressure</td>
+                        <td>{{ latest_data.blood_pressure[0] }}/{{ latest_data.blood_pressure[1] }} mmHg</td>
+                        <td>
+                            {% if latest_data.blood_pressure[0] > 140 %}
+                            <span class="badge bg-danger">High</span>
+                            {% elif latest_data.blood_pressure[0] < 90 %}
+                            <span class="badge bg-warning">Low</span>
+                            {% else %}
+                            <span class="badge bg-success">Normal</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Body Temperature</td>
+                        <td>{{ latest_data.body_temp }} °C</td>
+                        <td>
+                            {% if latest_data.body_temp > 38.0 %}
+                            <span class="badge bg-danger">High</span>
+                            {% elif latest_data.body_temp < 36.0 %}
+                            <span class="badge bg-warning">Low</span>
+                            {% else %}
+                            <span class="badge bg-success">Normal</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>SpO2</td>
+                        <td>{{ latest_data.spo2 }}%</td>
+                        <td>
+                            {% if latest_data.spo2 < 94 %}
+                            <span class="badge bg-danger">Low</span>
+                            {% else %}
+                            <span class="badge bg-success">Normal</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Glucose</td>
+                        <td>{{ latest_data.glucose }} mg/dL</td>
+                        <td>
+                            {% if latest_data.glucose > 140 %}
+                            <span class="badge bg-danger">High</span>
+                            {% elif latest_data.glucose < 70 %}
+                            <span class="badge bg-warning">Low</span>
+                            {% else %}
+                            <span class="badge bg-success">Normal</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% else %}
+                <p>No data available. <a href="/add_data" class="btn btn-primary btn-sm">Generate Data</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Health Alerts</h5>
+            </div>
+            <div class="card-body">
+                {% if alerts %}
+                <div class="alert alert-warning">
+                    <h6>{{ alerts|length }} Alert(s) Detected</h6>
+                    <ul class="list-group mt-2">
+                        {% for alert in alerts %}
+                        <li class="list-group-item list-group-item-warning">{{ alert.message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% else %}
+                <p>No alerts detected. All vitals are within normal range.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Heart Rate Trend</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="heartRateChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">Body Temperature Trend</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="temperatureChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Blood Pressure Trend</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="bloodPressureChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Blood Glucose Trend</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="glucoseChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Recent Health Records</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Block #</th>
+                                <th>Patient ID</th>
+                                <th>Time</th>
+                                <th>Heart Rate</th>
+                                <th>Blood Pressure</th>
+                                <th>Body Temp</th>
+                                <th>SpO2</th>
+                                <th>Glucose</th>
+                                <th>Alerts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for block in blocks %}
+                            <tr>
+                                <td>{{ block.index }}</td>
+                                <td>
+                                    <a href="/patient/{{ block.data.patient_id }}">
+                                        {{ block.data.patient_id }}
+                                    </a>
+                                </td>
+                                <td>{{ block.data.readable_time }}</td>
+                                <td>{{ block.data.heart_rate }} bpm</td>
+                                <td>{{ block.data.blood_pressure[0] }}/{{ block.data.blood_pressure[1] }}</td>
+                                <td>{{ block.data.body_temp }} °C</td>
+                                <td>{{ block.data.spo2 }}%</td>
+                                <td>{{ block.data.glucose }} mg/dL</td>
+                                <td>
+                                    {% if block.data.alerts %}
+                                    <span class="badge bg-danger">{{ block.data.alerts|length }}</span>
+                                    {% else %}
+                                    <span class="badge bg-success">0</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prepare data from blockchain blocks
+        const times = [{% for block in blocks %}'{{ block.data.readable_time }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+        const heartRates = [{% for block in blocks %}{{ block.data.heart_rate }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const temperatures = [{% for block in blocks %}{{ block.data.body_temp }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const systolic = [{% for block in blocks %}{{ block.data.blood_pressure[0] }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const diastolic = [{% for block in blocks %}{{ block.data.blood_pressure[1] }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const glucose = [{% for block in blocks %}{{ block.data.glucose }}{% if not loop.last %}, {% endif %}{% endfor %}];
+
+        // Heart Rate Chart
+        const heartRateCtx = document.getElementById('heartRateChart').getContext('2d');
+        new Chart(heartRateCtx, {
+            type: 'line',
+            data: {
+                labels: times,
+                datasets: [{
+                    label: 'Heart Rate (bpm)',
+                    data: heartRates,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 40,
+                        max: 140
+                    }
+                }
+            }
+        });
+        
+        // Temperature Chart
+        const tempCtx = document.getElementById('temperatureChart').getContext('2d');
+        new Chart(tempCtx, {
+            type: 'line',
+            data: {
+                labels: times,
+                datasets: [{
+                    label: 'Body Temperature (°C)',
+                    data: temperatures,
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 35,
+                        max: 40
+                    }
+                }
+            }
+        });
+        
+        // Blood Pressure Chart
+        const bpCtx = document.getElementById('bloodPressureChart').getContext('2d');
+        new Chart(bpCtx, {
+            type: 'line',
+            data: {
+                labels: times,
+                datasets: [
+                    {
+                        label: 'Systolic (mmHg)',
+                        data: systolic,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        fill: false
+                    },
+                    {
+                        label: 'Diastolic (mmHg)',
+                        data: diastolic,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true
+            }
+        });
+        
+        // Glucose Chart
+        const glucoseCtx = document.getElementById('glucoseChart').getContext('2d');
+        new Chart(glucoseCtx, {
+            type: 'line',
+            data: {
+                labels: times,
+                datasets: [{
+                    label: 'Blood Glucose (mg/dL)',
+                    data: glucose,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 60,
+                        max: 200
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

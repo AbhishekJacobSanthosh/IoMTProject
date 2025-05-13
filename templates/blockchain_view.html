@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Blockchain Explorer</h1>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Blockchain Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>{{ blockchain_data|length + 1 }}</h3>
+                                <p class="mb-0">Total Blocks</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>{{ patients|length }}</h3>
+                                <p class="mb-0">Unique Patients</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h3>{{ is_valid }}</h3>
+                                <p class="mb-0">Chain Validity</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Blockchain Ledger</h5>
+            </div>
+            <div class="card-body">
+                <div class="blockchain-container">
+                    {% for block in blockchain_data %}
+                    <div class="card mb-3 blockchain-block">
+                        <div class="card-header bg-dark text-white d-flex justify-content-between">
+                            <span>Block #{{ block.index }}</span>
+                            <span>{{ block.timestamp|timestamp_to_date }}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Hash:</strong> <span class="text-monospace">{{ block.hash[:20] }}...</span></p>
+                                    <p><strong>Previous Hash:</strong> <span class="text-monospace">{{ block.previous_hash[:20] }}...</span></p>
+                                    <p><strong>Patient ID:</strong> {{ block.data.patient_id }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Heart Rate:</strong> {{ block.data.heart_rate }} bpm</p>
+                                    <p><strong>Blood Pressure:</strong> {{ block.data.blood_pressure[0] }}/{{ block.data.blood_pressure[1] }} mmHg</p>
+                                    <p><strong>Body Temp:</strong> {{ block.data.body_temp }} °C</p>
+                                </div>
+                            </div>
+                            {% if block.data.alerts %}
+                            <div class="alert alert-warning mt-2">
+                                <strong>Alerts:</strong>
+                                <ul class="mb-0">
+                                    {% for alert in block.data.alerts %}
+                                    <li>{{ alert.message }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

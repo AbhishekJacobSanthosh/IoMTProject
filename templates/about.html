@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">IoMT-Blockchain Health Monitoring System</h2>
+                </div>
+                <div class="card-body">
+                    <h3>Welcome to the Future of Healthcare Data Management</h3>
+                    <p class="lead">
+                        This application demonstrates a novel approach to healthcare data management by integrating Internet of Medical Things (IoMT) devices with blockchain technology to create a secure, transparent, and patient-centric health monitoring system.
+                    </p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <img src="{{ url_for('static', filename='img/blockchain-health.jpg') }}" class="img-fluid rounded" alt="Blockchain Healthcare" onerror="this.src='https://via.placeholder.com/600x400?text=Blockchain+Healthcare'">
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Key Features</h4>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="bi bi-shield-lock text-primary"></i> 
+                                    <strong>Secure Health Data Storage</strong> - Immutable blockchain ledger prevents tampering
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-graph-up text-primary"></i> 
+                                    <strong>Real-time Health Monitoring</strong> - Continuous tracking of vital signs
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-bell text-primary"></i> 
+                                    <strong>Automated Health Alerts</strong> - Smart contracts detect abnormal readings
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-person-lock text-primary"></i> 
+                                    <strong>Patient Data Ownership</strong> - Patients control access to their health data
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-hospital text-primary"></i> 
+                                    <strong>Healthcare Provider Integration</strong> - Secure sharing with authorized doctors
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Research Foundation</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4>Based on "A Survey of Distributed Ledger Technologies in the Health Domain"</h4>
+                            <p>
+                                This implementation is inspired by the research paper by Ikramullah Khan, Sudip Phuyal, Ricardo Correia, and Joao C. Ferreira (2024), which explores how distributed ledger technologies can address critical challenges in healthcare data management:
+                            </p>
+                            <ul>
+                                <li><strong>Data Fragmentation</strong> - Traditional systems operate as isolated silos</li>
+                                <li><strong>Security Concerns</strong> - Conventional EHRs are vulnerable to breaches</li>
+                                <li><strong>Limited Interoperability</strong> - Difficulty sharing data across systems</li>
+                                <li><strong>Patient Disempowerment</strong> - Patients have little control over their data</li>
+                            </ul>
+                            <p>
+                                The paper surveys various blockchain applications in healthcare and identifies key frameworks that can transform health data management.
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5>Paper Reference</h5>
+                                    <p class="small">
+                                        Khan, I., Phuyal, S., Correia, R., & Ferreira, J. C. (2024). A Survey of Distributed Ledger Technologies in the Health Domain. Journal of Information and Automation Sciences, 19(6), 249-265. DOI: 10.2478/ias-2024-0017
+                                    </p>
+                                    <hr>
+                                    <p class="small">
+                                        <strong>Published:</strong> 2024<br>
+                                        <strong>Journal:</strong> JIAS, 19(6), 249-265
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">What Makes Our Implementation Unique</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Real-Time IoMT Integration</h4>
+                            <p>
+                                While the research paper discusses blockchain for EHRs, our implementation goes further by integrating Internet of Medical Things (IoMT) devices for real-time health monitoring. This creates a continuous, immutable health timeline that can be accessed by authorized providers or used for remote monitoring.
+                            </p>
+                            <p>
+                                Smart contracts automatically analyze incoming data to detect abnormal readings, enabling proactive healthcare interventions.
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Patient-Centric Design</h4>
+                            <p>
+                                Our system implements a strict role-based access control system that gives patients true ownership of their health data. Unlike traditional EHR systems where institutions control access, our blockchain implementation ensures:
+                            </p>
+                            <ul>
+                                <li>Patients can view their complete medical history</li>
+                                <li>Data cannot be altered retroactively</li>
+                                <li>All access attempts are logged on the blockchain</li>
+                                <li>Patients can grant and revoke access permissions</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h4>Technical Innovations</h4>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Feature</th>
+                                            <th>Traditional EHR</th>
+                                            <th>Basic Blockchain EHR</th>
+                                            <th>Our IoMT-Blockchain System</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Data Storage</td>
+                                            <td>Centralized database</td>
+                                            <td>Distributed ledger</td>
+                                            <td>Distributed ledger with real-time updates</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Collection</td>
+                                            <td>Manual entry</td>
+                                            <td>Manual entry</td>
+                                            <td>Automated IoMT device integration</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Health Monitoring</td>
+                                            <td>Periodic check-ups</td>
+                                            <td>Periodic check-ups</td>
+                                            <td>Continuous monitoring with alerts</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Analysis</td>
+                                            <td>Manual review</td>
+                                            <td>Manual review</td>
+                                            <td>Automated smart contract analysis</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Security Model</td>
+                                            <td>Perimeter security</td>
+                                            <td>Cryptographic security</td>
+                                            <td>Cryptographic security with role-based access</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">How to Use This System</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <h5>For Patients</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ol>
+                                        <li>Log in with your patient credentials</li>
+                                        <li>View your health dashboard showing vital signs</li>
+                                        <li>Monitor health trends over time through interactive charts</li>
+                                        <li>Receive alerts when readings are outside normal ranges</li>
+                                        <li>Access your complete medical history securely</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-danger text-white">
+                                    <h5>For Healthcare Providers</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ol>
+                                        <li>Log in with administrator credentials</li>
+                                        <li>Register new patients in the system</li>
+                                        <li>View and manage all patient records</li>
+                                        <li>Generate health data for monitoring</li>
+                                        <li>Explore the blockchain to verify data integrity</li>
+                                        <li>Receive alerts for abnormal patient readings</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

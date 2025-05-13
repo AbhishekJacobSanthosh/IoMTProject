@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Patient Data</h1>
+
+<div class="row mt-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Update Patient Information: {{ patient_id }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('edit_patient', patient_id=patient_id) }}">
+                    <div class="mb-3">
+                        <label for="patient_id" class="form-label">Patient ID</label>
+                        <input type="text" class="form-control" id="patient_id" value="{{ patient_id }}" disabled>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="heart_rate" class="form-label">Heart Rate (bpm)</label>
+                        <input type="number" class="form-control" id="heart_rate" name="heart_rate" 
+                               min="40" max="200" value="{{ patient_data.heart_rate }}" required>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="systolic" class="form-label">Systolic BP (mmHg)</label>
+                            <input type="number" class="form-control" id="systolic" name="systolic" 
+                                   min="70" max="200" value="{{ patient_data.blood_pressure[0] }}" required>
+                        </div>
+                        <div class="col">
+                            <label for="diastolic" class="form-label">Diastolic BP (mmHg)</label>
+                            <input type="number" class="form-control" id="diastolic" name="diastolic" 
+                                   min="40" max="120" value="{{ patient_data.blood_pressure[1] }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="body_temp" class="form-label">Body Temperature (°C)</label>
+                        <input type="number" class="form-control" id="body_temp" name="body_temp" 
+                               step="0.1" min="35" max="42" value="{{ patient_data.body_temp }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="spo2" class="form-label">SpO2 (%)</label>
+                        <input type="number" class="form-control" id="spo2" name="spo2" 
+                               min="80" max="100" value="{{ patient_data.spo2 }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="glucose" class="form-label">Blood Glucose (mg/dL)</label>
+                        <input type="number" class="form-control" id="glucose" name="glucose" 
+                               min="50" max="300" value="{{ patient_data.glucose }}" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Update Patient Data</button>
+                    <a href="{{ url_for('patient_history', patient_id=patient_id) }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

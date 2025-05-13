@@ -1,0 +1,78 @@
+/* Main styling */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard cards */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+/* Blockchain styling */
+.blockchain-container {
+    position: relative;
+}
+
+.blockchain-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 4px;
+    background-color: #007bff;
+    z-index: 0;
+}
+
+.blockchain-block {
+    position: relative;
+    margin-left: 40px;
+    transition: transform 0.3s ease;
+}
+
+.blockchain-block:hover {
+    transform: translateX(5px);
+}
+
+.blockchain-block::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -20px;
+    width: 20px;
+    height: 4px;
+    background-color: #007bff;
+}
+
+/* Charts */
+canvas {
+    max-height: 300px;
+}
+
+/* Responsive tables */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+}
+
+/* Badge styling */
+.badge {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+}

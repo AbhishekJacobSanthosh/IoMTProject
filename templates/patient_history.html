@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Patient History: {{ patient_id }}</h1>
+    {% if current_user.role == 'admin' %}
+    <div>
+        <a href="{{ url_for('edit_patient', patient_id=patient_id) }}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit Patient
+        </a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removePatientModal">
+            <i class="bi bi-trash"></i> Remove Patient
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+
+<!-- Remove Patient Modal -->
+<div class="modal fade" id="removePatientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Remove Patient</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove patient <strong>{{ patient_id }}</strong>?</p>
+                <p class="text-danger">This action cannot be undone. The patient's records will remain in the blockchain but will no longer be accessible through the patient registry.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('remove_patient', patient_id=patient_id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Remove Patient</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Health Data Trends</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <canvas id="heartRateChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <canvas id="bloodPressureChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="glucoseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Complete Medical History</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Heart Rate</th>
+                                <th>Blood Pressure</th>
+                                <th>Body Temp</th>
+                                <th>SpO2</th>
+                                <th>Glucose</th>
+                                <th>Alerts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in history %}
+                            <tr>
+                                <td>{{ record.readable_time }}</td>
+                                <td>{{ record.heart_rate }} bpm</td>
+                                <td>{{ record.blood_pressure[0] }}/{{ record.blood_pressure[1] }}</td>
+                                <td>{{ record.body_temp }} °C</td>
+                                <td>{{ record.spo2 }}%</td>
+                                <td>{{ record.glucose }} mg/dL</td>
+                                <td>
+                                    {% if record.alerts %}
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#alertModal{{ loop.index }}">
+                                        View {{ record.alerts|length }} Alert(s)
+                                    </button>
+                                    
+                                    <!-- Alert Modal -->
+                                    <div class="modal fade" id="alertModal{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title">Health Alerts</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <ul class="list-group">
+                                                        {% for alert in record.alerts %}
+                                                        <li class="list-group-item list-group-item-warning">{{ alert.message }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <span class="badge bg-success">No Alerts</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Prepare data for charts
+    const times = [{% for record in history %}'{{ record.readable_time }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+    const heartRates = [{% for record in history %}{{ record.heart_rate }}{% if not loop.last %}, {% endif %}{% endfor %}];
+    const temperatures = [{% for record in history %}{{ record.body_temp }}{% if not loop.last %}, {% endif %}{% endfor %}];
+    const systolic = [{% for record in history %}{{ record.blood_pressure[0] }}{% if not loop.last %}, {% endif %}{% endfor %}];
+    const diastolic = [{% for record in history %}{{ record.blood_pressure[1] }}{% if not loop.last %}, {% endif %}{% endfor %}];
+    const glucose = [{% for record in history %}{{ record.glucose }}{% if not loop.last %}, {% endif %}{% endfor %}];
+
+    // Heart Rate Chart
+    const heartRateCtx = document.getElementById('heartRateChart').getContext('2d');
+    new Chart(heartRateCtx, {
+        type: 'line',
+        data: {
+            labels: times,
+            datasets: [{
+                label: 'Heart Rate (bpm)',
+                data: heartRates,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Heart Rate Trend'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 40,
+                    max: 140
+                }
+            }
+        }
+    });
+
+    // Temperature Chart
+    const tempCtx = document.getElementById('temperatureChart').getContext('2d');
+    new Chart(tempCtx, {
+        type: 'line',
+        data: {
+            labels: times,
+            datasets: [{
+                label: 'Body Temperature (°C)',
+                data: temperatures,
+                borderColor: 'rgba(255, 159, 64, 1)',
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Body Temperature Trend'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 35,
+                    max: 40
+                }
+            }
+        }
+    });
+
+    // Blood Pressure Chart
+    const bpCtx = document.getElementById('bloodPressureChart').getContext('2d');
+    new Chart(bpCtx, {
+        type: 'line',
+        data: {
+            labels: times,
+            datasets: [
+                {
+                    label: 'Systolic (mmHg)',
+                    data: systolic,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2,
+                    fill: false
+                },
+                {
+                    label: 'Diastolic (mmHg)',
+                    data: diastolic,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Blood Pressure Trend'
+                }
+            }
+        }
+    });
+
+    // Glucose Chart
+    const glucoseCtx = document.getElementById('glucoseChart').getContext('2d');
+    new Chart(glucoseCtx, {
+        type: 'line',
+        data: {
+            labels: times,
+            datasets: [{
+                label: 'Blood Glucose (mg/dL)',
+                data: glucose,
+                borderColor: 'rgba(153, 102, 255, 1)',
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Blood Glucose Trend'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 60,
+                    max: 200
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Login</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <h5>Or login with MetaMask</h5>
+                    <div id="metamask-status"></div>
+                    <button id="metamask-connect" class="btn btn-warning" onclick="connectMetaMask()">
+                        <img src="{{ url_for('static', filename='image/metamask-icon.svg') }}" alt="MetaMask" height="20">
+                        Connect MetaMask
+                    </button>
+                </div>
+                
+                <div class="mt-3 text-center">
+                    <p>Are you an administrator? <a href="{{ url_for('admin_login') }}">Login as Admin</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/metamask.js') }}"></script>
+{% endblock %}
